@@ -267,8 +267,8 @@ AudioProcessorValueTreeState::ParameterLayout
             stringArray.add(str);
         }
         
-        layout.add(std::make_unique<AudioParameterChoice>(ParameterID("Low Cut Slope",1), "Low Cut Slope", stringArray, 0));
-        layout.add(std::make_unique<AudioParameterChoice>(ParameterID("Low Cut Slope",1), "Low Cut Slope", stringArray, 0));
+        layout.add(std::make_unique<AudioParameterChoice>(ParameterID("LowCut Slope",1), "Low Cut Slope", stringArray, 0));
+        layout.add(std::make_unique<AudioParameterChoice>(ParameterID("HighCut Slope",1), "High Cut Slope", stringArray, 0));
         
 
         

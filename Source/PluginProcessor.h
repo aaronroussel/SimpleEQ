@@ -72,7 +72,7 @@ public:
 
 private:
     
-    using Filter = juce::dsp::IIR::Filter<float>; // declaring an alis so we can avoid template shit
+    using Filter = juce::dsp::IIR::Filter<float>; // declaring an alias so we can avoid template shit
     
     // Processor Chains let us pass in a Process Context which runs through each element of the chain automatically
     
