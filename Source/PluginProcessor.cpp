@@ -96,6 +96,18 @@ void SimpleEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+    
+    // we pass a process spec object to prepare our filters
+    juce::dsp::ProcessSpec spec;
+    // define our parameters for the process
+    spec.maximumBlockSize = samplesPerBlock;
+    
+    spec.numChannels = 1;
+    
+    spec.sampleRate = sampleRate;
+    // prepare chains using the spec we laid out above
+    leftChain.prepare(spec);
+    rightChain.prepare(spec);
 }
 
 void SimpleEQAudioProcessor::releaseResources()
@@ -144,19 +156,21 @@ void SimpleEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     // this code if your algorithm always overwrites all the output channels.
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
-
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        auto* channelData = buffer.getWritePointer (channel);
-
-        // ..do something to the data...
-    }
+    // creating our audio block
+    juce::dsp::AudioBlock<float> block(buffer);
+    // getting our left and right channels seperated
+    auto leftBlock = block.getSingleChannelBlock(0);
+    auto rightBlock = block.getSingleChannelBlock(1);
+    
+    juce::dsp::ProcessContextReplacing<float> leftContext(leftBlock);
+    juce::dsp::ProcessContextReplacing<float> rightContext(rightBlock);
+    
+    leftChain.process(leftContext);
+    rightChain.process(rightContext);
+    
+    /*
+        For the chain to work we need to pass a processor context, which needs to be supplied with an audio block instance. Process black is called by the host and is given a buffer which can have any number of channels so we need to extract the left and right channels which are 0 and 2 respectively
+     */
 }
 
 //==============================================================================

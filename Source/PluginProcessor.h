@@ -60,6 +60,19 @@ public:
     static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     AudioProcessorValueTreeState apvts {*this, nullptr, "Parameters", createParameterLayout()};
 private:
+    
+    using Filter = juce::dsp::IIR::Filter<float>; // declaring an alis so we can avoid template shit
+    
+    // Processor Chains let us pass in a Process Context which runs through each element of the chain automatically
+    
+    using CutFilter = juce::dsp::ProcessorChain<Filter, Filter, Filter, Filter>;
+    
+    using MonoChain = juce::dsp::ProcessorChain<CutFilter, Filter, CutFilter>;
+    // delcaring chain for each channel since we want stereo processing
+    MonoChain leftChain, rightChain;
+    
+    // we will prepare these in the prepareToPlay section of the PluginProcessor.cpp
+    
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SimpleEQAudioProcessor)
 };
